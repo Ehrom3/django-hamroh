@@ -1,9 +1,12 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import CustomUser
 from .helpers import send_confirmation_email, make_confirmation_code
-
+from decimal import Decimal, InvalidOperation
+from datetime import datetime
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from .models import Trip
 
 def register_view(request):
     if request.user.is_authenticated:
@@ -83,3 +86,116 @@ def logout_view(request):
         logout(request)
         return redirect('login')
     return redirect('home')
+
+@login_required
+def my_trips_view(request):
+    if request.user.role != 'driver':
+        return redirect('home')
+    trips = Trip.objects.filter(user=request.user).order_by('-date')
+    return render(request, 'my_trips.html', {'trips': trips})
+
+
+@login_required
+def trip_create_view(request):
+    if request.user.role != 'driver':
+        return redirect('home')
+    error = ''
+    if request.method == 'POST':
+        start = request.POST.get('start_location', '').strip()
+        end = request.POST.get('end_location', '').strip()
+        brand = request.POST.get('car_brand', '').strip()
+        description = request.POST.get('description', '').strip()
+        photo = request.FILES.get('car_photo')
+        try:
+            year = int(request.POST.get('car_year', ''))
+            seats = int(request.POST.get('seats_available', ''))
+            price = Decimal(request.POST.get('price', ''))
+            date = datetime.fromisoformat(request.POST.get('date', ''))
+            date = timezone.make_aware(date)
+        except (ValueError, TypeError, InvalidOperation, OverflowError):
+            error = 'Проверь год, дату, места и цену.'
+        else:
+            if not start or not end or not brand or not photo:
+                error = 'Заполни обязательные поля и добавь фото.'
+            elif start.casefold() == end.casefold():
+                error = 'Города отправления и назначения совпадают.'
+            elif year < 1900 or year > timezone.localdate().year + 1:
+                error = 'Некорректный год автомобиля.'
+            elif seats < 1 or price < 0 or not price.is_finite():
+                error = 'Проверь количество мест и цену.'
+            elif price >= Decimal('10000000'):
+                error = 'Цена слишком большая.'
+            elif date <= timezone.now():
+                error = 'Дата поездки должна быть в будущем.'
+            elif not (photo.content_type or '').startswith('image/'):
+                error = 'Загрузи изображение автомобиля.'
+            else:
+                Trip.objects.create(
+                    user=request.user, start_location=start,
+                    end_location=end, car_brand=brand,
+                    car_year=year, car_photo=photo, date=date,
+                    seats_available=seats, price=price,
+                    description=description
+                )
+                return redirect('my_trips')
+    return render(request, 'trip_form.html', {'error': error})
+
+@login_required
+def trip_edit_view(request, trip_id):
+    if request.user.role != 'driver':
+        return redirect('home')
+    trip = get_object_or_404(Trip, id=trip_id, user=request.user)
+    error = ''
+    if request.method == 'POST':
+        start = request.POST.get('start_location', '').strip()
+        end = request.POST.get('end_location', '').strip()
+        brand = request.POST.get('car_brand', '').strip()
+        photo = request.FILES.get('car_photo')
+        try:
+            year = int(request.POST.get('car_year', ''))
+            seats = int(request.POST.get('seats_available', ''))
+            price = Decimal(request.POST.get('price', ''))
+            date = datetime.fromisoformat(request.POST.get('date', ''))
+            date = timezone.make_aware(date)
+        except (ValueError, TypeError, InvalidOperation, OverflowError):
+            error = 'Проверь год, дату, места и цену.'
+        else:
+            if not start or not end or not brand:
+                error = 'Заполни города и марку.'
+            elif start.casefold() == end.casefold():
+                error = 'Города отправления и назначения совпадают.'
+            elif year < 1900 or year > timezone.localdate().year + 1:
+                error = 'Некорректный год автомобиля.'
+            elif seats < 1 or price < 0 or not price.is_finite():
+                error = 'Проверь количество мест и цену.'
+            elif price >= Decimal('10000000'):
+                error = 'Цена слишком большая.'
+            elif date <= timezone.now():
+                error = 'Дата поездки должна быть в будущем.'
+            elif photo and not (photo.content_type or '').startswith('image/'):
+                error = 'Загрузи изображение автомобиля.'
+            else:
+                trip.start_location = start
+                trip.end_location = end
+                trip.car_brand = brand
+                trip.car_year = year
+                trip.date = date
+                trip.seats_available = seats
+                trip.price = price
+                trip.description = request.POST.get('description', '')
+                if photo:
+                    trip.car_photo = photo
+                trip.save()
+                return redirect('my_trips')
+    return render(request, 'trip_form.html', {
+        'trip': trip, 'error': error
+    })
+
+@login_required
+def trip_delete_view(request, trip_id):
+    if request.user.role != 'driver':
+        return redirect('home')
+    trip = get_object_or_404(Trip, id=trip_id, user=request.user)
+    if request.method == 'POST':
+        trip.delete()
+    return redirect('my_trips')

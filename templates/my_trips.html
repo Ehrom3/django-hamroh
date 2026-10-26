@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Мои поездки</title>
+</head>
+
+<body>
+    <h2>Мои поездки</h2>
+    <p><a href="{% url 'trip_create' %}">Добавить поездку</a></p>
+    {% for trip in trips %}
+    <hr>
+    <p>{{ trip.start_location }} - {{ trip.end_location }}</p>
+    <p>{{ trip.date }} | {{ trip.car_brand }} | {{ trip.price }} сомони</p>
+    <p>Свободных мест: {{ trip.seats_available }}</p>
+    {% if trip.car_photo %}
+    <img src="{{ trip.car_photo.url }}" width="180">
+    {% endif %}
+    <p><a href="{% url 'trip_edit' trip.id %}">Изменить</a></p>
+    <form action="{% url 'trip_delete' trip.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Удалить</button>
+    </form>
+    {% empty %}
+    <p>Поездок пока нет.</p>
+    {% endfor %}
+    <p><a href="{% url 'home' %}">На главную</a></p>
+</body>
+
+</html>

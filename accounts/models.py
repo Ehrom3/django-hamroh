@@ -30,7 +30,7 @@ class Trip(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.start_location} - {self.end_location}'
+        return self.start_location
     
 class CompanionRequest(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -39,4 +39,4 @@ class CompanionRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f'{self.user.username}: {self.trip}' 
+        return self.user 
