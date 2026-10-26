@@ -1,15 +1,1 @@
-{% extends 'base.html' %}{% block title %}Регистрация{% endblock %}{% block content %}<div class="auth-card card"><span
-        class="eyebrow">НАЧАЛО ПУТИ</span>
-    <h1>Создать аккаунт</h1>
-    <p class="muted">Введите данные. Мы отправим код подтверждения на почту.</p>
-    <form method="post">{% csrf_token %}<label>Ваше имя<input name="first_name" required autocomplete="given-name"
-                placeholder="Например, Анвар"></label><label>Электронная почта<input name="email" type="email" required
-                autocomplete="email" placeholder="name@gmail.com"></label><label>Пароль<input name="password"
-                type="password" required autocomplete="new-password" placeholder="Введите пароль"></label><label>Кем
-            будете пользоваться сайтом?<select name="role" required>
-                <option value="">Выберите роль</option>
-                <option value="passenger">Пассажир</option>
-                <option value="driver">Водитель</option>
-            </select></label><button type="submit" class="btn btn-wide">Зарегистрироваться →</button></form>
-    <p class="helper">Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
-</div>{% endblock %}
+{% extends 'base.html' %}{% block title %}Регистрация{% endblock %}{% block content %}<div class="auth-card card"><span class="eyebrow">НАЧАЛО ПУТИ</span><h1>Создать аккаунт</h1><p class="muted">Введите данные. Мы отправим код подтверждения на почту.</p><form method="post">{% csrf_token %}<label>Ваше имя<input name="first_name" required autocomplete="given-name" placeholder="Например, Анвар"></label><label>Электронная почта<input name="email" type="email" required autocomplete="email" placeholder="name@gmail.com"></label><label>Пароль<input name="password" type="password" required autocomplete="new-password" placeholder="Введите пароль"></label><label>Кем будете пользоваться сайтом?<select name="role" required><option value="">Выберите роль</option><option value="passenger">Пассажир</option><option value="driver">Водитель</option></select></label><button type="submit" class="btn btn-wide">Зарегистрироваться →</button></form><p class="helper">Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p></div>{% endblock %}

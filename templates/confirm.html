@@ -1,9 +1,32 @@
-{% extends 'base.html' %}{% block title %}Подтверждение почты{% endblock %}{% block content %}<div
-    class="auth-card card"><span class="eyebrow">ПОЧТИ ГОТОВО</span>
+{% extends "base.html" %}
+
+{% block title %}Подтверждение почты{% endblock %}
+
+{% block content %}
+
+<div class="auth-card">
+
+    <span class="eyebrow">ПОЧТИ ГОТОВО</span>
+
     <h1>Проверь почту</h1>
-    <p class="muted">Мы отправили шестизначный код на ваш email.</p>
-    <form method="post">{% csrf_token %}<label>Код подтверждения<input name="code" inputmode="numeric" maxlength="6"
-                minlength="6" pattern="[0-9]{6}" required placeholder="000000"
-                autocomplete="one-time-code"></label><button class="btn btn-wide" type="submit">Подтвердить →</button>
+
+    <p class="muted">
+        Мы отправили шестизначный код на ваш email.
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <label>Код подтверждения</label>
+
+        <input type="text" name="code" maxlength="6" minlength="6" pattern="[0-9]{6}" required placeholder="000000">
+
+        <button type="submit" class="btn btn-wide">
+            Подтвердить
+        </button>
+
     </form>
-</div>{% endblock %}
+
+</div>
+
+{% endblock %}

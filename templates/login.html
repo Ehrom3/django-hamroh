@@ -1,10 +1,1 @@
-{% extends 'base.html' %}{% block title %}Вход{% endblock %}{% block content %}<div class="auth-card card"><span
-        class="eyebrow">С ВОЗВРАЩЕНИЕМ</span>
-    <h1>Войти в аккаунт</h1>
-    <p class="muted">Рады снова видеть вас.</p>
-    <form method="post">{% csrf_token %}<label>Email<input name="email" type="email" required autocomplete="email"
-                placeholder="name@gmail.com"></label><label>Пароль<input name="password" type="password" required
-                autocomplete="current-password" placeholder="Ваш пароль"></label><button class="btn btn-wide"
-            type="submit">Войти →</button></form>
-    <p class="helper">Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a></p>
-</div>{% endblock %}
+{% extends 'base.html' %}{% block title %}Вход{% endblock %}{% block content %}<div class="auth-card card"><span class="eyebrow">С ВОЗВРАЩЕНИЕМ</span><h1>Войти в аккаунт</h1><p class="muted">Рады снова видеть вас.</p><form method="post">{% csrf_token %}<label>Email<input name="email" type="email" required autocomplete="email" placeholder="name@gmail.com"></label><label>Пароль<input name="password" type="password" required autocomplete="current-password" placeholder="Ваш пароль"></label><button class="btn btn-wide" type="submit">Войти →</button></form><p class="helper">Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a></p></div>{% endblock %}
