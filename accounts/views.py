@@ -6,7 +6,9 @@ from decimal import Decimal, InvalidOperation
 from datetime import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from .models import Trip
+from .models import Trip, CompanionRequest
+
+
 
 def register_view(request):
     if request.user.is_authenticated:
@@ -23,11 +25,9 @@ def register_view(request):
             error = 'Выбери роль.'
         elif CustomUser.objects.filter(email__iexact=email).exists():
             error = 'Этот email уже зарегистрирован.'
-        elif len(password) < 8:
-            error = 'Пароль должен быть не короче 8 символов.'
         else:
             user = CustomUser.objects.create_user(
-                username=email, email=email, password=password,
+                email=email, password=password,
                 first_name=first_name, role=role, is_active=False
             )
             code = make_confirmation_code()
@@ -93,7 +93,6 @@ def my_trips_view(request):
         return redirect('home')
     trips = Trip.objects.filter(user=request.user).order_by('-date')
     return render(request, 'my_trips.html', {'trips': trips})
-
 
 @login_required
 def trip_create_view(request):
@@ -199,3 +198,75 @@ def trip_delete_view(request, trip_id):
     if request.method == 'POST':
         trip.delete()
     return redirect('my_trips')
+
+@login_required
+def trips_list_view(request):
+    trips = Trip.objects.filter(
+        date__gt=timezone.now(),
+        seats_available__gt=0
+    ).order_by('date')
+    start = request.GET.get('start', '').strip()
+    end = request.GET.get('end', '').strip()
+    date_text = request.GET.get('date', '').strip()
+    error = ''
+    if start:
+        trips = trips.filter(start_location__icontains=start)
+    if end:
+        trips = trips.filter(end_location__icontains=end)
+    if date_text:
+        selected_date = parse_date(date_text)
+        if selected_date is None:
+            error = 'Укажи правильную дату.'
+            trips = trips.none()
+        else:
+            trips = trips.filter(date__date=selected_date)
+    return render(request, 'trips_list.html', {
+        'trips': trips,
+        'start': start,
+        'end': end,
+        'date_text': date_text,
+        'error': error,
+    })
+
+@login_required
+def trip_detail_view(request, trip_id):
+    trip = get_object_or_404(
+        Trip,
+        id=trip_id,
+        date__gt=timezone.now(),
+        seats_available__gt=0
+    )
+    return render(request, 'trip_detail.html', {'trip': trip})
+
+@login_required
+def request_trip_view(request, trip_id):
+    if request.user.role != 'passenger':
+        return redirect('trips_list')
+    if request.method != 'POST':
+        return redirect('trip_detail', trip_id=trip_id)
+    trip = get_object_or_404(Trip, id=trip_id)
+    if trip.date <= timezone.now() or trip.seats_available < 1:
+        return redirect('trips_list')
+    if CompanionRequest.objects.filter(
+        user=request.user, trip=trip
+    ).exists():
+        return redirect('trip_detail', trip_id=trip_id)
+    CompanionRequest.objects.create(user=request.user, trip=trip)
+    return redirect('trip_detail', trip_id=trip_id)
+
+@login_required
+def driver_requests_view(request):
+    if request.user.role != 'driver':
+        return redirect('home')
+    requests_list = CompanionRequest.objects.filter(
+        trip__user=request.user
+    ).order_by('-created_at')
+    return render(request, 'driver_requests.html', {
+        'requests_list': requests_list
+    })
+
+
+
+
+
+

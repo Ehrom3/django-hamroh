@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Поиск поездок</title>
+</head>
+
+<body>
+    <h2>Доступные поездки</h2>
+    <form method="get">
+        <input name="start" placeholder="Откуда" value="{{ start }}">
+        <input name="end" placeholder="Куда" value="{{ end }}">
+        <input type="date" name="date" value="{{ date_text }}">
+        <button type="submit">Найти</button>
+        <a href="{% url 'trips_list' %}">Сбросить</a>
+    </form>
+    {% if error %}<p style="color:red">{{ error }}</p>{% endif %}
+    {% for trip in trips %}
+    <hr>
+    <h3>{{ trip.start_location }} - {{ trip.end_location }}</h3>
+    <p>Дата: {{ trip.date }}</p>
+    <p>Машина: {{ trip.car_brand }} ({{ trip.car_year }})</p>
+    <p>Цена: {{ trip.price }} сомони</p>
+    <p>Свободно мест: {{ trip.seats_available }}</p>
+    {% if trip.car_photo %}
+    <img src="{{ trip.car_photo.url }}" width="180">
+    {% endif %}
+    <p><a href="{% url 'trip_detail' trip.id %}">
+            Подробнее</a></p>
+    {% empty %}
+    <p>Подходящих поездок нет.</p>
+    {% endfor %}
+    <p><a href="{% url 'home' %}">Главная</a></p>
+</body>
+
+</html>

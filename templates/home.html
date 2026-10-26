@@ -11,10 +11,15 @@
     <p>Роль: {{ request.user.role }}</p>
     <form method="post" action="{% url 'logout' %}">{% csrf_token %}
         <button type="submit">Выйти</button>
-    </form>
+    </form><br>
     {% if request.user.role == 'driver' %}
     <a href="{% url 'my_trips' %}">Мои поездки</a>
     {% endif %}
+    <br>
+    <p><a href="{% url 'trips_list' %}">
+    Посмотреть и найти поездки
+    </a></p>
+
 </body>
 
 </html>

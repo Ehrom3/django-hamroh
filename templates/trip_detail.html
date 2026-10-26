@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Детали поездки</title>
+</head>
+
+<body>
+    <h2>{{ trip.start_location }} - {{ trip.end_location }}</h2>
+    <p>Водитель: {{ trip.user.first_name }}</p>
+    <p>Дата и время: {{ trip.date }}</p>
+    <p>Марка: {{ trip.car_brand }}</p>
+    <p>Год машины: {{ trip.car_year }}</p>
+    <p>Свободных мест: {{ trip.seats_available }}</p>
+    <p>Цена: {{ trip.price }} сомони</p>
+    <p>Описание: {{ trip.description }}</p>
+    {% if trip.car_photo %}
+    <img src="{{ trip.car_photo.url }}" width="250">
+    {% endif %}
+    <p>Заявку на поездку добавим в этапе 5.</p>
+    <a href="{% url 'trips_list' %}">Назад к поездкам</a>
+</body>
+
+</html>
