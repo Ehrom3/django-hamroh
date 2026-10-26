@@ -1,0 +1,21 @@
+{% extends 'base.html' %}{% block title %}Мои заявки{% endblock %}{% block content %}<div class="page-head">
+    <div><span class="eyebrow">КАБИНЕТ ПАССАЖИРА</span>
+        <h1>Мои заявки</h1>
+        <p class="muted">Здесь видны ответы водителей.</p>
+    </div><a href="{% url 'trips_list' %}" class="btn">Найти поездку</a>
+</div>
+<div class="stack">{% for item in requests_list %}<article class="card list-row">
+        <div><span class="eyebrow">{{ item.trip.date|date:'d.m.Y · H:i' }}</span>
+            <h3>{{ item.trip.start_location }} → {{ item.trip.end_location }}</h3>
+            <p class="muted">Водитель: {{ item.trip.user.first_name|default:item.trip.user.email }} · {{ item.trip.price
+                }} сомони</p><span class="status status-{{ item.status }}">{% if item.status == 'pending' %}Ожидает
+                ответа{% elif item.status == 'accepted' %}Принята{% else %}Отклонена{% endif %}</span>
+        </div>
+        <div class="actions"><a class="btn btn-outline btn-small"
+                href="{% url 'trip_detail' item.trip.id %}">Посмотреть</a>{% if item.status == 'pending' %}<form
+                method="post" action="{% url 'cancel_request' item.id %}">{% csrf_token %}<button
+                    class="btn btn-danger btn-small" type="submit">Отменить</button></form>{% endif %}</div>
+    </article>{% empty %}<div class="empty-state">
+        <h3>Заявок ещё нет</h3>
+        <p>Найди поездку и отправь запрос водителю.</p>
+    </div>{% endfor %}</div>{% endblock %}

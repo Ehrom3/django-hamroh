@@ -1,0 +1,23 @@
+{% extends 'base.html' %}{% block title %}Заявки пассажиров{% endblock %}{% block content %}<div class="page-head">
+    <div><span class="eyebrow">КАБИНЕТ ВОДИТЕЛЯ</span>
+        <h1>Заявки пассажиров</h1>
+        <p class="muted">Подтверждай заявки, если есть свободные места.</p>
+    </div>
+</div>
+<div class="stack">{% for item in requests_list %}<div class="card list-row">
+        <div><span class="eyebrow">{{ item.created_at|date:'d.m.Y · H:i' }}</span>
+            <h3>{{ item.user.first_name|default:item.user.email }}</h3>
+            <p class="muted">{{ item.trip.start_location }} → {{ item.trip.end_location }} · {{
+                item.trip.date|date:'d.m.Y H:i' }}</p><span class="status status-{{ item.status }}">{% if item.status ==
+                'pending' %}Ожидает{% elif item.status == 'accepted' %}Принята{% else %}Отклонена{% endif %}</span>
+        </div>{% if item.status == 'pending' %}<div class="actions">
+            <form method="post" action="{% url 'request_decision' item.id %}">{% csrf_token %}<button
+                    class="btn btn-small" name="action" value="accept" type="submit">Принять</button></form>
+            <form method="post" action="{% url 'request_decision' item.id %}">{% csrf_token %}<button
+                    class="btn btn-outline btn-small" name="action" value="reject" type="submit">Отклонить</button>
+            </form>
+        </div>{% endif %}
+    </div>{% empty %}<div class="empty-state">
+        <h3>Новых заявок нет</h3>
+        <p>Когда пассажир отправит запрос, ты увидишь его здесь.</p>
+    </div>{% endfor %}</div>{% endblock %}

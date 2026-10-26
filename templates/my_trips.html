@@ -1,31 +1,20 @@
-<!DOCTYPE html>
-<html lang="ru">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Мои поездки</title>
-</head>
-
-<body>
-    <h2>Мои поездки</h2>
-    <p><a href="{% url 'trip_create' %}">Добавить поездку</a></p>
-    {% for trip in trips %}
-    <hr>
-    <p>{{ trip.start_location }} - {{ trip.end_location }}</p>
-    <p>{{ trip.date }} | {{ trip.car_brand }} | {{ trip.price }} сомони</p>
-    <p>Свободных мест: {{ trip.seats_available }}</p>
-    {% if trip.car_photo %}
-    <img src="{{ trip.car_photo.url }}" width="180">
-    {% endif %}
-    <p><a href="{% url 'trip_edit' trip.id %}">Изменить</a></p>
-    <form action="{% url 'trip_delete' trip.id %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Удалить</button>
-    </form>
-    {% empty %}
-    <p>Поездок пока нет.</p>
-    {% endfor %}
-    <p><a href="{% url 'home' %}">На главную</a></p>
-</body>
-
-</html>
+{% extends 'base.html' %}{% block title %}Мои поездки{% endblock %}{% block content %}<div class="page-head">
+    <div><span class="eyebrow">КАБИНЕТ ВОДИТЕЛЯ</span>
+        <h1>Мои поездки</h1>
+        <p class="muted">Управляй опубликованными поездками.</p>
+    </div><a class="btn" href="{% url 'trip_create' %}">+ Новая поездка</a>
+</div>
+<div class="stack">{% for trip in trips %}<article class="card list-row">
+        <div><span class="eyebrow">{{ trip.date|date:'d.m.Y · H:i' }}</span>
+            <h3>{{ trip.start_location }} → {{ trip.end_location }}</h3>
+            <p class="muted">{{ trip.car_brand }} · {{ trip.seats_available }} мест · {{ trip.price }} сомони</p>
+        </div>
+        <div class="actions"><a href="{% url 'trip_detail' trip.id %}" class="btn btn-outline btn-small">Открыть</a><a
+                href="{% url 'trip_edit' trip.id %}" class="btn btn-small">Изменить</a>
+            <form method="post" action="{% url 'trip_delete' trip.id %}" onsubmit="return confirm('Удалить поездку?')">
+                {% csrf_token %}<button class="btn btn-danger btn-small" type="submit">Удалить</button></form>
+        </div>
+    </article>{% empty %}<div class="empty-state">
+        <h3>Пока нет поездок</h3>
+        <p>Создай первую поездку, чтобы её увидели пассажиры.</p>
+    </div>{% endfor %}</div>{% endblock %}

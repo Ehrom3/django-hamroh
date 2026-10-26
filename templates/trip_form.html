@@ -1,30 +1,26 @@
-<!DOCTYPE html>
-<html lang="ru">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Поездка</title>
-</head>
-
-<body>
-    <h2>{% if trip %}Изменить поездку{% else %}Новая поездка{% endif %}</h2>
-    {% if error %}<p style="color:red">{{ error }}</p>{% endif %}
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <p>Откуда: <input name="start_location" required value="{{ trip.start_location|default:'' }}"></p>
-        <p>Куда: <input name="end_location" required value="{{ trip.end_location|default:'' }}"></p>
-        <p>Марка: <input name="car_brand" required value="{{ trip.car_brand|default:'' }}"></p>
-        <p>Год: <input type="number" name="car_year" required value="{{ trip.car_year|default:'' }}"></p>
-        <p>Фото: <input type="file" name="car_photo" accept="image/*" {% if not trip %}required{% endif %}></p>
-        <p>Дата: <input type="datetime-local" name="date" required value="{{ trip.date|date:'Y-m-d\TH:i' }}"></p>
-        <p>Места: <input type="number" name="seats_available" min="1" required
-                value="{{ trip.seats_available|default:'' }}"></p>
-        <p>Цена: <input type="number" name="price" step="0.01" min="0" required value="{{ trip.price|default:'' }}"></p>
-        <p>Описание:<br><textarea name="description">{{ trip.description|default:'' 
-}}</textarea></p>
-        <button type="submit">Сохранить</button>
-    </form>
-    <p><a href="{% url 'my_trips' %}">Мои поездки</a></p>
-</body>
-
-</html>
+{% extends 'base.html' %}{% block title %}{% if trip %}Редактировать поездку{% else %}Новая поездка{% endif %}{%
+endblock %}{% block content %}<div class="form-wrap"><a class="back-link" href="{% url 'my_trips' %}">← Мои поездки</a>
+    <div class="card form-card"><span class="eyebrow">ДЛЯ ВОДИТЕЛЯ</span>
+        <h1>{% if trip %}Редактировать поездку{% else %}Новая поездка{% endif %}</h1>
+        <p class="muted">Заполни данные автомобиля и маршрута.</p>
+        <form method="post" enctype="multipart/form-data">{% csrf_token %}<div class="form-grid"><label>Откуда<input
+                        name="start_location" required value="{{ trip.start_location|default:'' }}"
+                        placeholder="Душанбе"></label><label>Куда<input name="end_location" required
+                        value="{{ trip.end_location|default:'' }}" placeholder="Худжанд"></label><label>Марка
+                    автомобиля<input name="car_brand" required value="{{ trip.car_brand|default:'' }}"
+                        placeholder="Toyota"></label><label>Год автомобиля<input type="number" name="car_year"
+                        min="1900" max="2100" required value="{{ trip.car_year|default:'' }}"></label><label>Дата и
+                    время<input type="datetime-local" name="date" required
+                        value="{{ trip.date|date:'Y-m-d\TH:i' }}"></label><label>Свободные места<input type="number"
+                        name="seats_available" min="0" required
+                        value="{{ trip.seats_available|default:'' }}"></label><label>Цена (сомони)<input type="number"
+                        name="price" min="0" step="0.01" required
+                        value="{{ trip.price|default:'' }}"></label><label>Фото автомобиля<input type="file"
+                        name="car_photo" accept="image/*" {% if not trip %}required{% endif %}></label></div>{% if trip
+            and trip.car_photo %}<p class="muted">Текущее фото: <a href="{{ trip.car_photo.url }}" target="_blank"
+                    rel="noopener">посмотреть</a></p>{% endif %}<label>Описание<textarea name="description" rows="4"
+                    placeholder="Дополнительные детали поездки">{{ trip.description|default:'' }}</textarea></label><button
+                class="btn" type="submit">{% if trip %}Сохранить изменения{% else %}Создать поездку{% endif %}
+                →</button></form>
+    </div>
+</div>{% endblock %}

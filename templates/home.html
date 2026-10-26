@@ -1,25 +1,28 @@
-<!DOCTYPE html>
-<html lang="ru">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Главная</title>
-</head>
-
-<body>
-    <h2>Привет, {{ request.user.first_name }}!</h2>
-    <p>Роль: {{ request.user.role }}</p>
-    <form method="post" action="{% url 'logout' %}">{% csrf_token %}
-        <button type="submit">Выйти</button>
-    </form><br>
-    {% if request.user.role == 'driver' %}
-    <a href="{% url 'my_trips' %}">Мои поездки</a>
-    {% endif %}
-    <br>
-    <p><a href="{% url 'trips_list' %}">
-    Посмотреть и найти поездки
-    </a></p>
-
-</body>
-
-</html>
+{% extends 'base.html' %}{% block title %}Главная{% endblock %}{% block content %}<section class="hero">
+    <div><span class="eyebrow">ПОЕЗДКИ ПРОЩЕ, КОГДА ВМЕСТЕ</span>
+        <h1>Находи попутчиков.<br><span class="accent">Отправляйся в путь.</span></h1>
+        <p class="lead">Удобный способ найти поездку или предложить свободное место в автомобиле.</p>
+        <div class="actions"><a href="{% url 'trips_list' %}" class="btn">Найти поездку →</a>{% if user.role == 'driver'
+            %}<a href="{% url 'trip_create' %}" class="btn btn-outline">Добавить поездку</a>{% endif %}</div>
+    </div>
+    <div class="hero-card">
+        <div class="road-icon">🚘</div>
+        <div class="tag">Ваш следующий маршрут</div>
+        <h2>Вместе по пути</h2>
+        <p>Выбирай маршрут. Договаривайся о поездке. Экономь время.</p>
+    </div>
+</section>
+<section class="features">
+    <div class="feature"><span>01</span>
+        <h3>Выбирай маршрут</h3>
+        <p>Ищи поездки по городам и дате.</p>
+    </div>
+    <div class="feature"><span>02</span>
+        <h3>Отправляй заявку</h3>
+        <p>Водитель подтвердит свободное место.</p>
+    </div>
+    <div class="feature"><span>03</span>
+        <h3>Путешествуй</h3>
+        <p>Все детали поездки в одном месте.</p>
+    </div>
+</section>{% endblock %}
