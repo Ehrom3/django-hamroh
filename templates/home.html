@@ -1,9 +1,13 @@
-{% extends 'base.html' %}{% block title %}Главная{% endblock %}{% block content %}<section class="hero">
+{% extends 'base.html' %}
+{% block title %}Главная{% endblock %}
+{% block content %}
+<section class="hero">
     <div><span class="eyebrow">ПОЕЗДКИ ПРОЩЕ, КОГДА ВМЕСТЕ</span>
         <h1>Находи попутчиков.<br><span class="accent">Отправляйся в путь.</span></h1>
         <p class="lead">Удобный способ найти поездку или предложить свободное место в автомобиле.</p>
         <div class="actions"><a href="{% url 'trips_list' %}" class="btn">Найти поездку →</a>
-            {% if user.role == 'driver'%}<a href="{% url 'trip_create' %}" class="btn btn-outline">Добавить поездку</a>{% endif %}</div>
+            {% if user.role == 'driver'%}<a href="{% url 'trip_create' %}" class="btn btn-outline">Добавить поездку</a>{% endif %}
+        </div>
     </div>
     <div class="hero-card">
         <div class="road-icon">🚘</div>

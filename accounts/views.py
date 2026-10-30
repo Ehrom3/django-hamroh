@@ -1,6 +1,3 @@
-from datetime import datetime
-from decimal import Decimal, InvalidOperation
-
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
@@ -8,9 +5,10 @@ from django.db.models import F
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.dateparse import parse_date
-
 from .helpers import make_confirmation_code, send_confirmation_email
 from .models import CompanionRequest, CustomUser, Trip
+from datetime import datetime
+from decimal import Decimal
 
 
 def register_view(request):
@@ -74,8 +72,6 @@ def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email', '').strip().lower()
         password = request.POST.get('password', '')
-        # Django ModelBackend принимает имя идентификатора через username;
-        # при USERNAME_FIELD='email' фактически это email.
         user = authenticate(request, username=email, password=password)
         if user is not None:
             login(request, user)
@@ -110,7 +106,7 @@ def _trip_data(request, require_photo):
         date = datetime.fromisoformat(request.POST.get('date', ''))
         if timezone.is_naive(date):
             date = timezone.make_aware(date, timezone.get_current_timezone())
-    except (ValueError, TypeError, InvalidOperation, OverflowError):
+    except (ValueError):
         return None, 'Проверь год, дату, места и цену.'
     if not start or not end or not brand or (require_photo and not photo):
         return None, 'Заполни обязательные поля.'
@@ -285,7 +281,6 @@ def cancel_request_view(request, request_id):
         item = get_object_or_404(CompanionRequest, id=request_id, user=request.user)
         if item.status == 'pending':
             item.delete()
-        # Принятые заявки пока не отменяем: иначе надо возвращать место.
     return redirect('my_requests')
 
 
